@@ -146,7 +146,7 @@ Exemples de questions à poser :
 
 ## 9. Auteur
 
-**Aymane Brahimi**
+**EDDAOUDI Mohamed Aymane**
 Étudiant en Master DSS (Décision et Systèmes Intelligents) — ENSIAS, Rabat
 
 ---
