@@ -1,0 +1,32 @@
+# Node
+node_modules/
+dist/
+build/
+.npm/
+
+# Java / Maven
+target/
+*.class
+*.jar
+*.war
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.suo
+*.user
+.project
+.classpath
+.settings/
+
+# Environnement
+.env
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker local
+docker-volumes/

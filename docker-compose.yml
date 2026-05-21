@@ -1,0 +1,39 @@
+services:
+
+  # Backend Spring Boot — appelle l'API Groq (cloud)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: miola-backend
+    environment:
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - GROQ_MODEL=llama-3.1-8b-instant
+    ports:
+      - "8080:8080"
+    networks:
+      - miola-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 90s
+
+  # Frontend React + nginx
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: miola-frontend
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "5173:80"
+    networks:
+      - miola-network
+
+networks:
+  miola-network:
+    driver: bridge

@@ -1,0 +1,4 @@
+/* Padding en bas pour laisser la place au Footer fixed-bottom */
+body {
+  padding-bottom: 60px;
+}
