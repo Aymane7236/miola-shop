@@ -1,0 +1,91 @@
+# ============================================================
+# Deployment Spring Boot — 1 replica pour test (puis 3 quand stable)
+# ============================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: miola-backend
+  labels:
+    app: miola-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: miola-backend
+  template:
+    metadata:
+      labels:
+        app: miola-backend
+    spec:
+      containers:
+        - name: miola-backend
+          image: miola-backend:1.0
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "h2"
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: db-config
+                  key: host
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: db-config
+                  key: dbName
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secrets
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secrets
+                  key: password
+            - name: GROQ_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: groq-secret
+                  key: api-key
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 180
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 20
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 300
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 5
+---
+# ============================================================
+# Service NodePort
+# ============================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: miola-backend-svc
+spec:
+  type: NodePort
+  selector:
+    app: miola-backend
+  ports:
+    - port: 8080
+      targetPort: 8080

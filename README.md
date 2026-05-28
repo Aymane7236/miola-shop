@@ -144,14 +144,54 @@ Exemples de questions à poser :
 
 ---
 
-## 9. Auteur
+## 9. Déploiement Kubernetes
+
+En plus de Docker Compose, MIOLA Shop supporte un déploiement Kubernetes pour un environnement de type production.
+
+### Architecture K8s
+
+```
+Cluster Minikube
+├── Pod MySQL 5.7 (1 replica, PVC 1Gi)
+│   └── Service mysql (ClusterIP)
+└── Pods miola-backend (3 replicas)
+    └── Service miola-backend-svc (NodePort → http://localhost:8080)
+```
+
+La configuration est externalisée via **ConfigMap** (DB_HOST, DB_NAME) et **Secrets** (credentials MySQL + clé Groq).
+Le profil Spring Boot bascule automatiquement sur `mysql` grâce à la variable `SPRING_PROFILES_ACTIVE=mysql` injectée par le manifest K8s.
+
+### Démarrage rapide
+
+```bash
+# 1. Démarrer Minikube
+minikube start --driver=docker
+
+# 2. Encoder votre clé Groq et l'insérer dans k8s/03-groq-secret.yaml
+echo -n "gsk_..." | base64
+
+# 3. Depuis la racine du projet (Windows)
+k8s\deploy.cmd
+
+# 4. Obtenir l'URL d'accès
+minikube service miola-backend-svc --url
+```
+
+Voir [k8s/README.md](k8s/README.md) pour les instructions complètes.
+
+> **Note :** Minikube doit être installé localement. Le frontend React reste servi
+> séparément (Docker Compose ou `npm run dev`) — seul le backend est déployé sur K8s.
+
+---
+
+## 10. Auteur
 
 **EDDAOUDI Mohamed Aymane**
 Étudiant en Master DSS (Décision et Systèmes Intelligents) — ENSIAS, Rabat
 
 ---
 
-## 10. Note pédagogique — API Groq et confidentialité
+## 11. Note pédagogique — API Groq et confidentialité
 
 L'API Groq est utilisée en mode **cloud** : les questions posées dans l'interface de chat transitent par les serveurs de Groq pour inférence. Le modèle `llama-3.1-8b-instant` offre :
 

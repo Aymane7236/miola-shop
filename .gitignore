@@ -30,3 +30,6 @@ Thumbs.db
 
 # Docker local
 docker-volumes/
+
+# K8s secrets contenant des vraies cles API
+k8s/03-groq-secret.yaml
